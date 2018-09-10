@@ -94,6 +94,8 @@ contract PlusCoin is StandardToken
         return burn(_value);
     }
 
+
+    // commented by Lee
     // /**
     // * @dev Token Contract Emergency Drain
     // * @param _token - Token to drain
