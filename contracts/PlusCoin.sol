@@ -94,14 +94,14 @@ contract PlusCoin is StandardToken
         return burn(_value);
     }
 
-    /**
-    * @dev Token Contract Emergency Drain
-    * @param _token - Token to drain
-    * @param _amount - Amount to drain
-    */
-    function emergencyERC20Drain( ERC20 _token, uint _amount ) public onlySuperAdmins {
-        _token.transfer( owner, _amount );
-    }
+    // /**
+    // * @dev Token Contract Emergency Drain
+    // * @param _token - Token to drain
+    // * @param _amount - Amount to drain
+    // */
+    // function emergencyERC20Drain( ERC20 _token, uint _amount ) public onlySuperAdmins {
+    //     _token.transfer( owner, _amount );
+    // }
 
     /* This unnamed function is called whenever someone tries to send ether directly to the token contract */
     // function () public
