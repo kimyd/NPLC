@@ -1,10 +1,10 @@
 // Lee, July 29, 2018
 pragma solidity ^0.4.24;
 
-import "./Administratable.sol";
+import "./Whitelistable.sol";
 import "./SafeMath.sol";
 
-contract Freezable is Administratable {
+contract Freezable is Whitelistable {
   using SafeMath for uint256;
 
   bool public frozenToken;
@@ -13,10 +13,31 @@ contract Freezable is Administratable {
   event FrozenFunds(address indexed _target, bool _frozen);
   event FrozenToken(bool _frozen);
 
-  modifier unlessFrozen {
+  // modifier unlessFrozen {
+  //   require(!frozenToken);
+  //   require(!frozenAccount[msg.sender]);
+  //   _;
+  // }
+
+ modifier unlessFrozen( address _to ) {
     require(!frozenToken);
-    require(!frozenAccount[msg.sender]);
+    if(!whitelistedTransferer[_to])
+    {
+        require(!frozenAccount[msg.sender]);
+        require(!frozenAccount[_to]);
+    }
+    
     _;
+  }
+
+  modifier unlessFrozenFrom( address _from, address _to ) {
+      if(!whitelistedTransferer[_to])
+      {
+          require(!frozenAccount[msg.sender]);
+          require(!frozenAccount[_to]);
+          require(!frozenAccount[_from]);
+      }
+      _;
   }
 
   function freezeAccount(address _target, bool _freeze) public onlySuperAdmins {

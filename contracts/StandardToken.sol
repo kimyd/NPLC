@@ -74,9 +74,9 @@ contract StandardToken is ERC20, TimeLockable, Freezable {
    * @param _value The amount of tokens to be spent.
    */
    // added 
-    function approve(address _spender, uint256 _value) public unlessFrozen returns (bool) {
+    function approve(address _spender, uint256 _value) public unlessFrozen(_spender) returns (bool) {
         require(_spender != address(0));
-        require(!frozenAccount[_spender]);
+        // require(!frozenAccount[_spender]);
         require(msg.sender != _spender);
         allowed[msg.sender][_spender] = _value;
         emit Approval(msg.sender, _spender, _value);

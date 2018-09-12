@@ -15,16 +15,16 @@ contract TimeLockable is Whitelistable{
         return now;
     }
 
-    modifier unlessTimeLocked(address _sender, address _to) {
+    modifier unlessTimeLocked( address _to) {
         if(!whitelistedTransferer[_to])
-            require(now >= timelockedAccount[_sender]);
+            require(now >= timelockedAccount[msg.sender]);
         _;
     }
 
-    modifier unlessTimeLockedFrom(address _sender, address _from, address _to) {
+    modifier unlessTimeLockedFrom( address _from, address _to) {
         if(!whitelistedTransferer[_to])
         {
-            require(now >= timelockedAccount[_sender]);
+            require(now >= timelockedAccount[msg.sender]);
             require(now >= timelockedAccount[_from]);
         }
         _;

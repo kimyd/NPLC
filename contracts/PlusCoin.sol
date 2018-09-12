@@ -40,12 +40,12 @@ contract PlusCoin is StandardToken
     * @param _value The amount to be transferred.
     */    
     // function transfer(address _to, uint _value) onlyWhenUnlocked unlessFrozen validDestination(_to) returns (bool) 
-    function transfer(address _to, uint _value) unlessTimeLocked(msg.sender, _to) validDestination(_to) unlessFrozen public returns (bool) 
+    function transfer(address _to, uint _value) unlessTimeLocked(_to) validDestination(_to) unlessFrozen(_to) public returns (bool) 
     {
         // require(allowTransfers || whitelistedTransferer[msg.sender]);
         // require(whitelistedTransferer[msg.sender]);
         // require(!frozenAccount[_to]);
-        require(!frozenAccount[_to]);
+        // require(!frozenAccount[_to]);
         return super.transfer(_to, _value);
     }
 
@@ -56,11 +56,11 @@ contract PlusCoin is StandardToken
     * @param _value uint256 the amount of tokens to be transferred
     */
     // function transferFrom(address _from, address _to, uint _value) onlyWhenUnlocked unlessFrozen validDestination(_to) returns (bool) 
-    function transferFrom(address _from, address _to, uint _value) unlessTimeLockedFrom(msg.sender, _from, _to) validDestination(_to) unlessFrozen public returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) unlessTimeLockedFrom(_from, _to) validDestination(_to) unlessFrozenFrom(_from, _to) public returns (bool) 
     {
         // require(allowTransfers);
-        require(!frozenAccount[_from]);
-        require(!frozenAccount[_to]);
+        // require(!frozenAccount[_from]);
+        // require(!frozenAccount[_to]);
         require(_from != msg.sender);
         // if(!whitelistedTransferer[_from])
         //     require(block.timestamp >= getLockFundsReleaseTime(_from));
