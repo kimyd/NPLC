@@ -1,38 +1,27 @@
 // Lee, July 29, 2018
-pragma solidity ^0.4.24;
-import './StandardToken.sol';
+pragma solidity 0.4.24;
+// import './StandardToken.sol';
+import './TimeLockable.sol';
+import './Freezable.sol';
+import './openzeppelin/token/ERC20/ERC20Burnable.sol';
 
-contract PlusCoin is StandardToken
+contract XtockToken is ERC20Burnable, TimeLockable, Freezable
 {
-    string 	public 	constant name 		= "PlusCoin";
-    string 	public 	constant symbol 	= "NPLC";
-    uint8 	public 	constant decimals 	= 18;
+    string  public  constant name       = "PlusCoin";
+    string  public  constant symbol     = "NPLC";
+    uint8   public  constant decimals   = 18;
     
     event Burn(address indexed _burner, uint _value);
 
+
     constructor( address _registry, uint _totalTokenAmount ) public
     {
-        totalSupply_ = _totalTokenAmount;
-        balances[_registry] = _totalTokenAmount;
+        _totalSupply = _totalTokenAmount;
+        _balances[_registry] = _totalTokenAmount;
         addSuperAdmin(_registry);
         emit Transfer(address(0x0), _registry, _totalTokenAmount);
     }
 
-    /**
-     * @dev Token Contract Modifier
-     * @param _to - Address to check if valid
-     *
-     *  Check if an address is valid
-     *  A valid address is as follows,
-     *    1. Not zero address
-     *    2. Not token address
-     */
-    modifier validDestination( address _to )
-    {
-        require(_to != address(0x0));
-        require(_to != address(this));
-        _;
-    }
 
     /**
     * @dev Transfer token for a specified address
@@ -40,12 +29,8 @@ contract PlusCoin is StandardToken
     * @param _value The amount to be transferred.
     */    
     // function transfer(address _to, uint _value) onlyWhenUnlocked unlessFrozen validDestination(_to) returns (bool) 
-    function transfer(address _to, uint _value) unlessTimeLocked(_to) validDestination(_to) unlessFrozen(_to) public returns (bool) 
+    function transfer(address _to, uint _value) validateAddress(_to) unlessTimeLocked(_to) isNotFrozen(_to) public returns (bool) 
     {
-        // require(allowTransfers || whitelistedTransferer[msg.sender]);
-        // require(whitelistedTransferer[msg.sender]);
-        // require(!frozenAccount[_to]);
-        // require(!frozenAccount[_to]);
         return super.transfer(_to, _value);
     }
 
@@ -56,67 +41,50 @@ contract PlusCoin is StandardToken
     * @param _value uint256 the amount of tokens to be transferred
     */
     // function transferFrom(address _from, address _to, uint _value) onlyWhenUnlocked unlessFrozen validDestination(_to) returns (bool) 
-    function transferFrom(address _from, address _to, uint _value) unlessTimeLockedFrom(_from, _to) validDestination(_to) unlessFrozenFrom(_from, _to) public returns (bool) 
+    function transferFrom(address _from, address _to, uint _value) validateAddress(_to) unlessTimeLockedFrom(_from, _to) isNotFrozenFrom(_from, _to) public returns (bool) 
     {
-        // require(allowTransfers);
-        // require(!frozenAccount[_from]);
-        // require(!frozenAccount[_to]);
-        require(_from != msg.sender);
-        // if(!whitelistedTransferer[_from])
-        //     require(block.timestamp >= getLockFundsReleaseTime(_from));
         return super.transferFrom(_from, _to, _value);
+    }
+
+    function approve(address _spender, uint256 _value) public validateAddress(_spender) isNotFrozen(_spender) unlessTimeLocked(_spender) returns (bool) 
+    {
+        return super.approve(_spender, _value);
+    }
+
+    function increaseAllowance( address _spender, uint256 _addedValue ) public validateAddress(_spender) isNotFrozen(_spender) unlessTimeLocked(_spender) returns (bool)
+    {
+        return super.decreaseAllowance(_spender, _addedValue);
+    }
+
+    function decreaseAllowance(address _spender, uint256 _subtractedValue) public validateAddress(_spender) isNotFrozen(_spender) unlessTimeLocked(_spender) returns (bool)
+    {
+        return super.decreaseAllowance(_spender, _subtractedValue);
     }
 
     /**
     * @dev Burns a specific amount of tokens.
-    * @param _value The amount of token to be burned.
-    */    
-    function burn(uint _value) public returns (bool)
-    {
-        balances[msg.sender] = balances[msg.sender].sub(_value);
-        totalSupply_ = totalSupply_.sub(_value);
-        emit Burn(msg.sender, _value);
-        emit Transfer(msg.sender, address(0x0), _value);
-        return true;
+    * @param value The amount of token to be burned.
+    */
+    function burn(uint256 value) public onlyOwner{
+        return super.burn(value);
     }
 
     /**
-     * Destroy tokens from other account
-     *
-     * Remove `_value` tokens from the system irreversibly on behalf of `_from`.
-     *
-     * @param _from the address of the sender
-     * @param _value the amount of money to burn
-     */
-    function burnFrom(address _from, uint256 _value) public returns (bool) 
-    {
-        assert( transferFrom( _from, msg.sender, _value ) );
-        return burn(_value);
+    * @dev Burns a specific amount of tokens from the target address and decrements allowance
+    * @param from address The address which you want to send tokens from
+    * @param value uint256 The amount of token to be burned
+    */
+    function burnFrom(address from, uint256 value) public onlyOwner validateAddress(from){
+        return super.burnFrom(from, value);
     }
 
-
-    // commented by Lee
-    // /**
-    // * @dev Token Contract Emergency Drain
-    // * @param _token - Token to drain
-    // * @param _amount - Amount to drain
-    // */
-    // function emergencyERC20Drain( ERC20 _token, uint _amount ) public onlySuperAdmins {
-    //     _token.transfer( owner, _amount );
-    // }
-
-    /* This unnamed function is called whenever someone tries to send ether directly to the token contract */
-    // function () public
-    function () public payable 
-    {
-        revert(); // Prevents accidental sending of ether
+    /**
+    * @dev Token Contract Emergency Drain
+    * @param _token - Token to drain
+    * @param _amount - Amount to drain
+    */
+    function emergencyERC20Drain( IERC20 _token, uint _amount ) public onlyOwner {
+        _token.transfer( owner(), _amount );
     }
-
-    // bool public allowTransfers;
-    // function setAllowTransfers(bool _allowTransfers) public onlySuperAdmins returns (bool) {
-    //     allowTransfers = _allowTransfers;
-    //     return true;
-    // }
-
-}	
+}   
 

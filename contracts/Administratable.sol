@@ -1,34 +1,41 @@
 // Lee, July 29, 2018
-pragma solidity ^0.4.24;
+pragma solidity 0.4.24;
 
 // August 21, 2018
 // remove all admin code.
 
-
-import "./Ownable.sol";
-import "./SafeMath.sol";
+import "./openzeppelin/ownership/Ownable.sol";
+import "./openzeppelin/math/SafeMath.sol";
 
 contract Administratable is Ownable {
-  using SafeMath for uint256;
-  mapping (address => bool) public superAdmins;
+	using SafeMath for uint256;
+	mapping (address => bool) public superAdmins;
 
-  event AddSuperAdmin(address indexed admin);
-  event RemoveSuperAdmin(address indexed admin);
+	event AddSuperAdmin(address indexed admin);
+	event RemoveSuperAdmin(address indexed admin);
 
-  modifier onlySuperAdmins {
-    if (msg.sender != owner && !superAdmins[msg.sender]) revert();
-    _;
-  }
 
-  function addSuperAdmin(address admin) public onlySuperAdmins {
-    require(admin != address(0));
-    superAdmins[admin] = true;
-    emit AddSuperAdmin(admin);
-  }
+    modifier validateAddress( address _addr )
+    {
+        require(_addr != address(0x0));
+        require(_addr != address(this));
+        _;
+    }
 
-  function removeSuperAdmin(address admin) public onlySuperAdmins {
-    require(admin != address(0));
-    superAdmins[admin] = false;
-    emit RemoveSuperAdmin(admin);
-  }
+	modifier onlySuperAdmins {
+		require(msg.sender == owner() || superAdmins[msg.sender]);
+		_;
+	}
+
+	function addSuperAdmin(address _admin) public onlySuperAdmins validateAddress(_admin){
+		require(!superAdmins[_admin]);
+		superAdmins[_admin] = true;
+		emit AddSuperAdmin(_admin);
+	}
+
+	function removeSuperAdmin(address _admin) public onlySuperAdmins validateAddress(_admin){
+		require(!superAdmins[_admin]);
+		superAdmins[_admin] = false;
+		emit RemoveSuperAdmin(_admin);
+	}
 }
