@@ -1,6 +1,5 @@
 var HDWalletProvider = require('truffle-hdwallet-provider');
-var infura_apikey = '884db4568d45403cb5f013db4d44a1c0884db4568d45403cb5f013db4d44a1c0';
-
+var infura_apikey = '884db4568d45403cb5f013db4d44a1c0';
 var mnemonic = 'minus taps socks alone color memory fruit dinosaur joyful thin sword mile';
 
 module.exports = {
@@ -19,6 +18,10 @@ module.exports = {
       network_id: 5777 // Match any network id,
     },
 
+    rinkeby: {
+      provider: new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/"+infura_apikey),
+      network_id: 4
+    },
 
     // rinkeby: {
     //   host: "localhost", // Connect to geth on the specified
@@ -27,11 +30,11 @@ module.exports = {
     //   network_id: 4,
     //   gas: 4612388 // Gas limit used for deploys
     // },
-    rinkeby: {
-      provider: new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/"+infura_apikey),
-      network_id: 4
-      // gas: 3000000
-    },
+    // rinkeby: {
+    //   provider: new HDWalletProvider(mnemonic, "https://rinkeby.infura.io/v3/"+infura_apikey),
+    //   network_id: 4
+    //   // gas: 3000000
+    // },
     live: {
       host: "localhost",
       port: 8546,

@@ -1,31 +1,31 @@
 // Lee, July 29, 2018
 pragma solidity 0.4.24;
 
-import "./Whitelistable.sol";
+import "./Administratable.sol";
 
-contract Freezable is Whitelistable {
-    using SafeMath for uint256;
+contract Freezable is Administratable {
 
     bool public frozenToken;
-    mapping (address => bool) public frozenAccount;
+    mapping (address => bool) public frozenAccounts;
 
     event FrozenFunds(address indexed _target, bool _frozen);
     event FrozenToken(bool _frozen);
 
     modifier isNotFrozen( address _to ) {
         require(!frozenToken);
-        require(whitelistedTransferer[_to] || (!whitelistedTransferer[_to] && !frozenAccount[msg.sender] && !frozenAccount[_to]));
+        require(!frozenAccounts[msg.sender] && !frozenAccounts[_to]);
         _;
     }
 
     modifier isNotFrozenFrom( address _from, address _to ) {
-        require(whitelistedTransferer[_to] || (!whitelistedTransferer[_to] && !frozenAccount[msg.sender] && !frozenAccount[_from] && !frozenAccount[_to]));
+        require(!frozenToken);
+        require(!frozenAccounts[msg.sender] && !frozenAccounts[_from] && !frozenAccounts[_to]);
         _;
     }
 
-    function freezeAccount(address _target, bool _freeze) public onlySuperAdmins validateAddress(_target){
-        require(frozenAccount[_target] != _freeze);
-        frozenAccount[_target] = _freeze;
+    function freezeAccount(address _target, bool _freeze) public onlySuperAdmins validateAddress(_target) {
+        require(frozenAccounts[_target] != _freeze);
+        frozenAccounts[_target] = _freeze;
         emit FrozenFunds(_target, _freeze);
     }
 

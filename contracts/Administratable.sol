@@ -5,10 +5,8 @@ pragma solidity 0.4.24;
 // remove all admin code.
 
 import "./openzeppelin/ownership/Ownable.sol";
-import "./openzeppelin/math/SafeMath.sol";
 
 contract Administratable is Ownable {
-	using SafeMath for uint256;
 	mapping (address => bool) public superAdmins;
 
 	event AddSuperAdmin(address indexed admin);
@@ -27,14 +25,14 @@ contract Administratable is Ownable {
 		_;
 	}
 
-	function addSuperAdmin(address _admin) public onlySuperAdmins validateAddress(_admin){
+	function addSuperAdmin(address _admin) public onlyOwner validateAddress(_admin){
 		require(!superAdmins[_admin]);
 		superAdmins[_admin] = true;
 		emit AddSuperAdmin(_admin);
 	}
 
-	function removeSuperAdmin(address _admin) public onlySuperAdmins validateAddress(_admin){
-		require(!superAdmins[_admin]);
+	function removeSuperAdmin(address _admin) public onlyOwner validateAddress(_admin){
+		require(superAdmins[_admin]);
 		superAdmins[_admin] = false;
 		emit RemoveSuperAdmin(_admin);
 	}
