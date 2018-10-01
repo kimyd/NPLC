@@ -79,8 +79,6 @@ contract('Administratable', (accounts) => {
         this.administratable.addSuperAdmin(accounts[2])
       );
 
-
-
       await assertRevert(
         this.administratable.removeSuperAdmin(accounts[2], {from: accounts[1]})
       );
@@ -92,8 +90,6 @@ contract('Administratable', (accounts) => {
       await assertRevert(
         this.administratable.removeSuperAdmin(this.administratable.address)
       );
-
-
     });
 
     it('a non super admin cannot add another super admin', async function () {

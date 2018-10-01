@@ -1,17 +1,12 @@
 // Lee, July 29, 2018
 pragma solidity 0.4.24;
-
-// August 21, 2018
-// remove all admin code.
-
-import "./openzeppelin/ownership/Ownable.sol";
+import "openzeppelin-solidity/contracts/ownership/Ownable.sol";
 
 contract Administratable is Ownable {
 	mapping (address => bool) public superAdmins;
 
 	event AddSuperAdmin(address indexed admin);
 	event RemoveSuperAdmin(address indexed admin);
-
 
     modifier validateAddress( address _addr )
     {

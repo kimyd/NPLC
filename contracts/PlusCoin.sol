@@ -1,7 +1,7 @@
 // Lee, July 29, 2018
 pragma solidity 0.4.24;
+import "openzeppelin-solidity/contracts/token/ERC20/ERC20Burnable.sol";
 import './Freezable.sol';
-import './openzeppelin/token/ERC20/ERC20Burnable.sol';
 
 contract PlusCoin is ERC20Burnable, Freezable
 {
