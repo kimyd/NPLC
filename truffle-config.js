@@ -20,14 +20,20 @@ const ropstenProvider = process.env.SOLIDITY_COVERAGE
 module.exports = {
   networks: {
     development: {
-      host: 'localhost',
+      host: "localhost",
       port: 8545,
-      network_id: '*' 
+      network_id: "*", // Match any network id,
+      gas: 4612388 
     },
     ropsten: {
       provider: ropstenProvider,
       network_id: 3 
     },
+    rinkeby: {
+      provider: ropstenProvider,
+      network_id: 4 
+    },
+
     kovan: {
       provider: ropstenProvider,
       network_id: 42 
@@ -45,8 +51,10 @@ module.exports = {
       network_id: '*' 
     },
     main: {
-      provider: ropstenProvider,
-      network_id: 1 
+      host: "localhost",
+      port: 8545,
+      network_id: "*", // Match any network id,
+      gas: 4612388 
     }
   },
   mocha: {
