@@ -17,3 +17,8 @@ we may specify the admin account address and total number of tokens. E.g.
    please refer to truffle.js for configuration
 
    $ truffle migrate --network rinkeby
+
+## 3. contract information
+   deployed contract information
+    https://etherscan.io/token/0x97fb6fc2ad532033af97043b563131c5204f8a35
+    
